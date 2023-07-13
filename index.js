@@ -30,7 +30,7 @@ function verifyJWT(req, res, next) {
         if (err) {
             return res.status(403).send({ message: 'forbidden access' })
         }
-        req.decoded;
+        req.decoded = decoded;
         next()
     })
 }
@@ -109,13 +109,14 @@ async function run() {
             const decodedEmail = req.decoded?.email;
 
             if (email !== decodedEmail) {
-                return res.status(403).send({ message: 'forbidden access' })
+                return res.status(403).send({ message: 'forbidden access' });
             }
 
             const query = { email: email };
             const bookings = await bookingCollection.find(query).toArray();
-            res.send(bookings)
+            res.send(bookings);
         })
+
 
         app.post('/bookings', async (req, res) => {
             const booking = req.body;
@@ -168,12 +169,11 @@ async function run() {
             const query = { email: decodedEmail };
             const user = await usersCollection.findOne(query);
             if (user?.role !== 'admin') {
-                return res.status(403).send({ message: 'forbidden Access' })
+                return res.status(403).send({ message: 'forbidden access' })
             }
-
             const id = req.params.id;
             const filter = { _id: new ObjectId(id) };
-            const options = { upsert: true };
+            const options = { upsert: true }
             const updatedDoc = {
                 $set: {
                     role: 'admin'
@@ -181,6 +181,7 @@ async function run() {
             };
             const result = await usersCollection.updateOne(filter, updatedDoc, options);
             res.send(result)
+
         })
 
     }
